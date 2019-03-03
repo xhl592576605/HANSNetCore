@@ -81,7 +81,7 @@
             return View();
         }
     `
-4. 生成token
+4. 生成token  
     ` public class HomeController : Controller
      {
         private readonly IJsonWebTokenBuilder jsonWebTokenBuilder;
