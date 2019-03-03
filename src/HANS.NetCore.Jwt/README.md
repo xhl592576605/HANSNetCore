@@ -13,18 +13,22 @@
 #### 使用  
 1. `appsettings.json`的配置  
     - `appsettings.json` 需要配置以下节点，其中`ExpiresMinute`为失效时间，默认30分钟  
-        ` "JsonWebToken": {
+        ```
+        "JsonWebToken": {
                     "SecurityKey": "HmacSha256的秘钥",
                     "ExpiresMinute":30
-        } `
+        } 
+        ```
 
 2. 中间件的使用 
     - 注册服务
-        ` public void ConfigureServices(IServiceCollection services) {
+        ```
+        public void ConfigureServices(IServiceCollection services) {
          services.AddJwt(Configuration);}
-        `
+        ```
     - 使用中间件  
-       `   public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+       ```
+       public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             app.UseJwtCustomerAuthorize(option =>
             {
@@ -41,48 +45,55 @@
                     return true;
                 });
             });
-        } `
+        } 
+        ```
 
 3. 授权验证的使用  
-    - 注册服务与直接注册授
-    ` public void ConfigureServices(IServiceCollection services)
-        {
-            services.AddJwt(Configuration);
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
-            services.AddAuthorization(option =>
+    - 注册服务与直接注册授权
+    
+        ```
+           public void ConfigureServices(IServiceCollection services)
             {
-                #region 自定义验证策略 可以一直自定义策略
-                option.AddPolicy("common", policy => policy.Requirements.Add(new CommonAuthorize().
-                    SetValidateFunc((playLoad, sertting) =>
-                    {
-                        //每个策略自定义验证函数，playLoad为带过来的参数字典，setting为失效时间与秘钥
-                        return true;
-                    })));
-                #endregion 自定义验证策略
-            }).AddAuthentication(option =>
-            {
-                option.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-            });
-        } `
+                services.AddJwt(Configuration);
+                services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+                services.AddAuthorization(option =>
+                {
+                    #region 自定义验证策略 可以一直自定义策略
+                    option.AddPolicy("common", policy => policy.Requirements.Add(new CommonAuthorize().
+                        SetValidateFunc((playLoad, sertting) =>
+                        {
+                            //每个策略自定义验证函数，playLoad为带过来的参数字典，setting为失效时间与秘钥
+                            return true;
+                        })));
+                    #endregion 自定义验证策略
+                }).AddAuthentication(option =>
+                {
+                    option.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+                });
+            } 
+        ```  
         
-    - 使用授权验证中间件
-    `
-     public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+    
+    - 使用授权验证中间件  
+    
+        ```
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            app.UseAuthentication();
+                app.UseAuthentication();
         }
-    `
+        ```
     - Controller/Action应用
-    `
+        ```
         //使用JwtAuthorizeAttribute，定义策略名字
         [JwtAuthorizeAttribute(Policy = "common")]
         public IActionResult Index()
         {
             return View();
         }
-    `
-4. 生成token
-    ` public class HomeController : Controller
+        ```
+4. 生成token  
+    ```
+    public class HomeController : Controller
      {
         private readonly IJsonWebTokenBuilder jsonWebTokenBuilder;
         public HomeController(IJsonWebTokenBuilder jsonWebTokenBuilder)
@@ -94,4 +105,5 @@
         {
             return Content(jsonWebTokenBuilder.CreateJsonWebToken(payLoad));
         }
-    } `
+    } 
+    ```
