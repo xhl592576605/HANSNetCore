@@ -1,6 +1,6 @@
 ﻿using HANS.NetCore.Jwt.Interface;
-using HANS.NetCore.Jwt.Interface.Policy;
 using HANS.NetCore.Jwt.Sample.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -9,19 +9,19 @@ namespace HANS.NetCore.Jwt.Sample.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly IJsonWebTokenBuilder jsonWebTokenBuilder;
+        private IJsonWebTokenBuilder jsonWebTokenBuilder { get; set; }
 
         public HomeController(IJsonWebTokenBuilder jsonWebTokenBuilder)
         {
             this.jsonWebTokenBuilder = jsonWebTokenBuilder;
         }
 
-        [JwtAuthorizeAttribute(Policy = "common")]
         public IActionResult Index()
         {
             return View();
         }
 
+        [Authorize(Policy = "common")]
         public IActionResult Privacy()
         {
             return View();
@@ -33,7 +33,6 @@ namespace HANS.NetCore.Jwt.Sample.Controllers
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
 
-        [HttpPost]
         public IActionResult CreateJsonToken(Dictionary<string, string> payLoad)
         {
             return Content(jsonWebTokenBuilder.CreateJsonWebToken(payLoad));

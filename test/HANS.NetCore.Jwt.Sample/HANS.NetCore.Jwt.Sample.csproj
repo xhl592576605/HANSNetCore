@@ -13,7 +13,7 @@
 
 
   <ItemGroup>
-    <ProjectReference Include="..\..\HANS.NetCore.Jwt\HANS.NetCore.Jwt.csproj" />
+    <ProjectReference Include="..\..\src\HANS.NetCore.Jwt\HANS.NetCore.Jwt.csproj" />
   </ItemGroup>
 
 </Project>
